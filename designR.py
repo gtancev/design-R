@@ -1,3 +1,6 @@
+__author__ = "Georgi Tancev"
+__copyright__ = "© Georgi Tancev"
+
 import pandas as pd
 import numpy as np
 import altair as alt
