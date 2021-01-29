@@ -65,7 +65,7 @@ def get_table_download_link(DataFrame):
     """
     val = to_excel(DataFrame)
     b64 = base64.b64encode(val)
-    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="design.xlsx">Download design.</a>'
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="design.xlsx">Download design protocol.</a>'
 
 
 def factorial_design(n_factors):
@@ -161,7 +161,7 @@ def main():
              2. Set labels, minimum, and maximum values of factors.
              3. Choose design class and customize it.
              4. Inspect design for correctness.
-             5. Download protocol.
+             5. Download design protocol.
              """)
 
     st.subheader("Set number of factors.")
