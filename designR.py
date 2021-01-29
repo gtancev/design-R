@@ -122,7 +122,7 @@ def composite_design(n_factors):
                                          "faced"])
 
     n_c1 = st.sidebar.number_input("""number of center points in
-                                   the factorial block.""", min_value=4)
+                                   the factorial block""", min_value=4)
 
     n_c2 = st.sidebar.number_input("""number of center points in
                                    the star block""", min_value=4)
@@ -183,11 +183,11 @@ def main():
                                           value=str(i)))
 
         with col2:
-            low.append(col2.number_input("min. level ("+str(i)+")",
+            low.append(col2.number_input("minimum level ("+str(i)+")",
                                          value=-1))
 
         with col3:
-            high.append(col3.number_input("max. level ("+str(i)+")",
+            high.append(col3.number_input("maximum level ("+str(i)+")",
                                           value=1))
 
     st.sidebar.subheader("Customize experimental design.")
