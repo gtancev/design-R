@@ -1,0 +1,10 @@
+flask
+flask_cors
+gunicorn
+streamlit
+numpy
+altair
+pandas
+xlrd
+xlsxwriter
+pyDOE2
