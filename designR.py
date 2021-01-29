@@ -171,7 +171,7 @@ def main():
                           max_value=10,
                           value=4, step=1)
 
-    st.subheader("Set factor names and values.")
+    st.subheader("Set factor names and levels.")
 
     col1, col2, col3 = st.beta_columns(3)
 
