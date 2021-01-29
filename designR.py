@@ -119,7 +119,7 @@ def composite_design(n_factors):
     alpha = st.sidebar.selectbox("symmetry",
                                  options=["orthogonal", "rotatable"])
 
-    face = st.sidebar.selectbox("eometry",
+    face = st.sidebar.selectbox("geometry",
                                 options=["circumscribed",
                                          "inscribed",
                                          "faced"])
