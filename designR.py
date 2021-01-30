@@ -196,6 +196,7 @@ def main():
     st.sidebar.subheader("Customize experimental design.")
 
     rescaled = st.sidebar.checkbox("rescale levels", value=True)
+    sorted = st.sidebar.checkbox("sort levels", value=True)
 
     design = st.sidebar.selectbox("design class",
                                   options=["full factorial",
@@ -218,18 +219,21 @@ def main():
     else:
         M = box_behnken_design(n_factors)
 
-    st.subheader("Inspect experimental design.")
-
-    for k in range(0, n_factors):
-        M = M[np.argsort(M[:, k], axis=0, kind="stable"), :]
     if rescaled:
-        data = compute_table(M, low, high)
+        M = compute_table(M, low, high)
     else:
-        data = M
-    table = pd.DataFrame(data=data,
+        st.info("""Rescale option has not been selected,
+                levels are standarized.""")
+    if sorted:
+        for k in range(0, n_factors):
+            M = M[np.argsort(M[:, k], axis=0, kind="stable"), :]
+    table = pd.DataFrame(data=M,
                          index=np.arange(1, M.shape[0]+1),
                          columns=labels)
     table.index.name = "Experiment"
+
+    st.subheader("Inspect experimental design.")
+
     st.table(table)
 
     st.markdown(get_table_download_link(table), unsafe_allow_html=True)
