@@ -195,6 +195,8 @@ def main():
 
     st.sidebar.subheader("Customize experimental design.")
 
+    rescaled = st.sidebar.checkbox("rescale levels", value=True)
+
     design = st.sidebar.selectbox("design class",
                                   options=["full factorial",
                                            "fractional factorial",
@@ -220,7 +222,10 @@ def main():
 
     for k in range(0, n_factors):
         M = M[np.argsort(M[:, k], axis=0, kind="stable"), :]
-    data = compute_table(M, low, high)
+    if rescaled:
+        data = compute_table(M, low, high)
+    else:
+        data = M
     table = pd.DataFrame(data=data,
                          index=np.arange(1, M.shape[0]+1),
                          columns=labels)
