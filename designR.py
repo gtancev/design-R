@@ -8,10 +8,12 @@ import streamlit as st
 from pyDOE2.doe_factorial import *
 from pyDOE2.doe_composite import *
 from pyDOE2.doe_box_behnken import *
+from pyDOE2.doe_plackett_burman import *
 from PIL import Image
 import base64
 from io import BytesIO
 import xlsxwriter
+
 
 image = Image.open("logo.png")
 
@@ -149,11 +151,41 @@ def box_behnken_design(n_factors):
     return bbdesign(n_factors, n_c1)
 
 
-def main():
-    st.sidebar.text("© Georgi Tancev")
+def plackett_burman_design(n_factors):
+    """
+    Create Plackett-Burman design.
 
-    st.image(image, caption="""design-R is an application
-    for design of experiments.""", use_column_width=True)
+    Inputs:
+    n_factors, number of factors
+
+    Outputs:
+    design matrix
+    """
+    return pbdesign(n_factors)
+
+
+def main():
+    st.sidebar.markdown(f'<a href="https://www.linkedin.com/in/gtancev/">© Georgi Tancev</a>',
+                        unsafe_allow_html=True)
+
+    st.image(image, use_column_width=True)
+
+    st.markdown("""
+                design-R is a web application for the design of experiments
+                (based on the Python library pyDOE).
+                """)
+    with st.beta_expander(label="Learn more."):
+        st.markdown("""
+                    The theory of experimental design proposes optimal
+                    configurations of factors (variables) while
+                    minimizing the number of performed experiments
+                    (data). Nevertheless, limiting the amount
+                    of available data reduces the number of
+                    parameters that can be included in a model,
+                    thereby constraining model complexity.
+                    """)
+        st.markdown("See "+f'<a href="https://towardsdatascience.com/an-introduction-to-design-of-experiments-3e86ea3ef7f6">"An Introduction to Design of Experiments"</a>'+".",
+                    unsafe_allow_html=True)
 
     st.subheader("Read instructions.")
     st.write("""
@@ -196,11 +228,12 @@ def main():
     st.sidebar.subheader("Customize experimental design.")
 
     rescaled = st.sidebar.checkbox("rescale levels", value=True)
-    sorted = st.sidebar.checkbox("sort levels", value=True)
+    sorted = st.sidebar.checkbox("sort experiments", value=True)
 
     design = st.sidebar.selectbox("design class",
                                   options=["full factorial",
                                            "fractional factorial",
+                                           "Plackett-Burman",
                                            "central composite",
                                            "Box-Behnken"],
                                   index=0)
@@ -214,6 +247,8 @@ def main():
             st.error("""One or more higher order design generators
                      do not match base designs.""")
             st.stop()
+    elif design == "Plackett-Burman":
+        M = plackett_burman_design(n_factors)
     elif design == "central composite":
         M = composite_design(n_factors)
     else:
