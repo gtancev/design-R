@@ -16,6 +16,7 @@ import xlsxwriter
 
 
 image = Image.open("logo.png")
+design_image = Image.open("fullfact.png")
 
 
 def compute_table(M, low, high):
@@ -165,47 +166,60 @@ def plackett_burman_design(n_factors):
 
 
 def main():
-    st.sidebar.markdown(f'<a href="https://www.linkedin.com/in/gtancev/">© Georgi Tancev</a>',
-                        unsafe_allow_html=True)
 
-    st.image(image, use_column_width=True)
+    st.set_page_config(page_title="design-R",
+                       page_icon="🎨",
+                       layout="centered",
+                       initial_sidebar_state="auto")
 
-    st.markdown("""
-                design-R is a web application for the design of experiments
-                (based on the Python library pyDOE).
+    # st.sidebar.markdown(f'<a href="https://github.com/gtancev">© Georgi Tancev</a>',
+                        # unsafe_allow_html=True)
+
+    st.sidebar.subheader("Optional: Rescaling and sorting.")
+
+    rescaled = st.sidebar.checkbox("Rescale levels.", value=False)
+    sorted = st.sidebar.checkbox("Sort experiments.", value=True)
+
+    st.sidebar.subheader("Choose design class.")
+
+    design = st.sidebar.selectbox("design class",
+                                  options=["full factorial",
+                                           "fractional factorial",
+                                           "Plackett-Burman",
+                                           "central composite",
+                                           "Box-Behnken"],
+                                  index=2)
+
+    st.image(image, use_column_width=True,
+             caption="""design-R is a web application for
+                the design of (laboratory) experiments.""")
+
+    with st.expander(label="Read instructions."):
+
+        st.write("""
+                1. Set number of factors.
+                2. Choose design class (and customize it).
+                3. Optional: Set labels, minimum, and maximum values of factors.
+                4. Inspect design for correctness.
+                5. Download design protocol.
                 """)
-    with st.beta_expander(label="Learn more."):
-        st.markdown("""
-                    The theory of experimental design proposes optimal
-                    configurations of factors (variables) while
-                    minimizing the number of performed experiments
-                    (data). Nevertheless, limiting the amount
-                    of available data reduces the number of
-                    parameters that can be included in a model,
-                    thereby constraining model complexity.
-                    """)
-        st.markdown("See "+f'<a href="https://towardsdatascience.com/an-introduction-to-design-of-experiments-3e86ea3ef7f6">"An Introduction to Design of Experiments"</a>'+".",
-                    unsafe_allow_html=True)
-
-    st.subheader("Read instructions.")
-    st.write("""
-             1. Set number of factors.
-             2. Set labels, minimum, and maximum values of factors.
-             3. Choose design class and customize it.
-             4. Inspect design for correctness.
-             5. Download design protocol.
-             """)
 
     st.subheader("Set number of factors.")
 
     n_factors = st.slider("number of factors",
-                          min_value=1,
+                          min_value=2,
                           max_value=10,
-                          value=4, step=1)
+                          value=7, step=1)
 
-    st.subheader("Set factor names and levels.")
+    st.subheader("Optional: Set labels and levels.")
 
-    col1, col2, col3 = st.beta_columns(3)
+    if not rescaled:
+        st.info("""
+                If rescale option is not selected, min./max. levels
+                will not apply.
+                """)
+
+    col1, col2, col3 = st.columns(3)
 
     labels = []
     low = []
@@ -214,29 +228,15 @@ def main():
     for i in range(1, n_factors+1):
 
         with col1:
-            labels.append(col1.text_input("factor name ("+str(i)+")",
-                                          value=str(i)))
+            labels.append(col1.text_input("label of factor "+str(i),
+                                          value="x"+str(i)))
 
         with col2:
-            low.append(col2.number_input("minimum level ("+str(i)+")",
+            low.append(col2.number_input("min. level of factor "+str(i),
                                          value=-1))
-
         with col3:
-            high.append(col3.number_input("maximum level ("+str(i)+")",
+            high.append(col3.number_input("max. level of factor "+str(i),
                                           value=1))
-
-    st.sidebar.subheader("Customize experimental design.")
-
-    rescaled = st.sidebar.checkbox("rescale levels", value=True)
-    sorted = st.sidebar.checkbox("sort experiments", value=True)
-
-    design = st.sidebar.selectbox("design class",
-                                  options=["full factorial",
-                                           "fractional factorial",
-                                           "Plackett-Burman",
-                                           "central composite",
-                                           "Box-Behnken"],
-                                  index=0)
 
     if design == "full factorial":
         M = factorial_design(n_factors)
@@ -256,9 +256,6 @@ def main():
 
     if rescaled:
         M = compute_table(M, low, high)
-    else:
-        st.info("""Rescale option has not been selected,
-                levels are standarized.""")
     if sorted:
         for k in range(0, n_factors):
             M = M[np.argsort(M[:, k], axis=0, kind="stable"), :]
@@ -268,10 +265,34 @@ def main():
     table.index.name = "Experiment"
 
     st.subheader("Inspect experimental design.")
+    st.write("The number of experiments to be performed is",
+             table.shape[0], ".")
 
-    st.table(table)
+    if sorted:
+        st.info("""
+                Note that it is good practice to perform
+                experiments in a random order.
+                """)
+
+    st.dataframe(table)
 
     st.markdown(get_table_download_link(table), unsafe_allow_html=True)
+
+    with st.sidebar.expander(label="Read more about design of experiments."):
+        st.markdown("""
+                    The theory of experimental design proposes optimal
+                    configurations of $k$ factors (i.e., independent variables $x_1$,
+                    $x_2$, $...$, $x_k$) in order to asses their effect on
+                    a dependent variable $y$ while minimizing the number of experiments
+                    that have to be performed. Nevertheless, limiting the amount
+                    of available data reduces the number of
+                    parameters that can be included in a model,
+                    thereby constraining model complexity.
+                    """)
+        st.image(design_image, use_column_width=True,
+                caption="Full factorial design for three factors.")
+        # st.markdown("See "+f'<a href="https://towardsdatascience.com/an-introduction-to-design-of-experiments-3e86ea3ef7f6">"An Introduction to Design of Experiments"</a>'+".",
+                    # unsafe_allow_html=True)
 
     return
 
