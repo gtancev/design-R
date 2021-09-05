@@ -56,21 +56,6 @@ def to_excel(DataFrame):
     return processed_data
 
 
-def get_table_download_link(DataFrame):
-    """
-    Download Excel-file.
-
-    Inputs:
-    pd.DataFrame
-
-    Outputs:
-    Download of file.
-    """
-    val = to_excel(DataFrame)
-    b64 = base64.b64encode(val)
-    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="design.xlsx">Download design protocol.</a>'
-
-
 def factorial_design(n_factors):
     """
     Create two-level full factorial design.
@@ -252,7 +237,11 @@ def main():
     elif design == "central composite":
         M = composite_design(n_factors)
     else:
-        M = box_behnken_design(n_factors)
+        try:
+            M = box_behnken_design(n_factors)
+        except AssertionError:
+            st.error("""Number of factors must be at least three.""")
+            st.stop()
 
     if rescaled:
         M = compute_table(M, low, high)
@@ -270,29 +259,32 @@ def main():
 
     if sorted:
         st.info("""
-                Note that it is good practice to perform
+                It is good practice to perform
                 experiments in a random order.
                 """)
 
     st.dataframe(table)
 
-    st.markdown(get_table_download_link(table), unsafe_allow_html=True)
+    st.download_button("Download design.",
+                       to_excel(table),
+                       "design.xlsx")
 
     with st.sidebar.expander(label="Read more about design of experiments."):
         st.markdown("""
                     The theory of experimental design proposes optimal
-                    configurations of $k$ factors (i.e., independent variables $x_1$,
+                    configurations of $k$ factors (i.e.,
+                    independent variables $x_1$,
                     $x_2$, $...$, $x_k$) in order to asses their effect on
-                    a dependent variable $y$ while minimizing the number of experiments
-                    that have to be performed. Nevertheless, limiting the amount
+                    a dependent variable $y$ while minimizing
+                    the number of experiments
+                    that have to be performed. Nevertheless,
+                    limiting the amount
                     of available data reduces the number of
                     parameters that can be included in a model,
                     thereby constraining model complexity.
                     """)
         st.image(design_image, use_column_width=True,
-                caption="Full factorial design for three factors.")
-        # st.markdown("See "+f'<a href="https://towardsdatascience.com/an-introduction-to-design-of-experiments-3e86ea3ef7f6">"An Introduction to Design of Experiments"</a>'+".",
-                    # unsafe_allow_html=True)
+                 caption="Full factorial design for three factors.")
 
     return
 
