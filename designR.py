@@ -206,22 +206,21 @@ def main():
 
     col1, col2, col3 = st.columns(3)
 
-    labels = []
-    low = []
-    high = []
+    labels = np.empty(n_factors, dtype=np.object_)
+    low = np.empty(n_factors)
+    high = np.empty(n_factors)
 
     for i in range(1, n_factors+1):
 
         with col1:
-            labels.append(col1.text_input("label of factor "+str(i),
-                                          value="x"+str(i)))
-
+            labels[i-1] = col1.text_input("label of factor "+str(i),
+                                          value="x"+str(i))
         with col2:
-            low.append(col2.number_input("min. level of factor "+str(i),
-                                         value=-1))
+            low[i-1] = col2.number_input("min. level of factor "+str(i),
+                                         value=-1)
         with col3:
-            high.append(col3.number_input("max. level of factor "+str(i),
-                                          value=1))
+            high[i-1] = col3.number_input("max. level of factor "+str(i),
+                                          value=1)
 
     if design == "full factorial":
         M = factorial_design(n_factors)
