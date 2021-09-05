@@ -105,7 +105,8 @@ def composite_design(n_factors):
     design matrix
     """
     alpha = st.sidebar.selectbox("symmetry",
-                                 options=["orthogonal", "rotatable"])
+                                 options=["orthogonal", 
+                                          "rotatable"])
 
     face = st.sidebar.selectbox("geometry",
                                 options=["circumscribed",
