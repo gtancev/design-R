@@ -1,6 +1,7 @@
 __author__ = "Georgi Tancev"
 __copyright__ = "© Georgi Tancev"
 
+from itertools import combinations
 import pandas as pd
 import numpy as np
 import altair as alt
@@ -79,10 +80,20 @@ def fractorial_design(n_factors):
     Outputs:
     design matrix
     """
-    generator = "A B C D E F G H I J K L M N O P Q R S T"
+    alphabet = "A B C D E F G H I J K L M N O P Q R S T"
+    length = int(np.ceil((n_factors+1)/2))
+    letters = alphabet[:2*length:2]
+
+    words = []
+    for k in reversed(range(1, length+1)):
+        for word in combinations(letters, k):
+            words.append("".join(word[:]))
+
+    generator = alphabet[:2*length]+" ".join(words[:(n_factors-length)])
+
     gens = st.sidebar.text_input("""design generators
                                  (separated by spaces)""",
-                                 value=generator[0:2*n_factors])
+                                 value=generator)
 
     n_generators = len((gens[:-1] if gens[-1] == " " else gens).split(" "))
 
